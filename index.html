@@ -1,0 +1,161 @@
+<!doctype html>
+
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>TailorMe • AI Chat</title>
+
+  <style>
+
+    body{font-family:system-ui,Arial;margin:0;background:#0f1115;color:#eaeaea;}
+
+    .wrap{max-width:720px;margin:40px auto;padding:16px}
+
+    h1{margin:0 0 12px}
+
+    .row{display:flex;gap:8px;margin:12px 0}
+
+    select,input,button,textarea{padding:10px;border-radius:8px;border:1px solid #333;background:#171923;color:#eaeaea}
+
+    textarea{width:100%;height:120px;resize:vertical}
+
+    button{cursor:pointer}
+
+    .bubble{background:#1f2330;padding:12px;border-radius:10px;margin:8px 0;white-space:pre-wrap}
+
+    .me{background:#2b2f3a}
+
+    .muted{opacity:.8;font-size:.9em}
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <h1>TailorMe – AI Chat</h1>
+
+    <div class="muted">اختر اللغة ثم اكتب سؤالك عن التفصيل/الأسعار/المواعيد.</div>
+
+
+
+    <div class="row">
+
+      <select id="lang">
+
+        <option value="ar" selected>العربية</option>
+
+        <option value="en">English</option>
+
+        <option value="es">Español</option>
+
+      </select>
+
+      <input id="name" placeholder="اسمك (اختياري)" />
+
+    </div>
+
+
+
+    <textarea id="msg" placeholder="اكتب رسالتك هنا..."></textarea>
+
+    <div class="row">
+
+      <button id="send">إرسال</button>
+
+      <button id="clear">مسح المحادثة</button>
+
+    </div>
+
+
+
+    <div id="chat"></div>
+
+  </div>
+
+
+
+  <script>
+
+    const chat = document.getElementById('chat');
+
+    const send = document.getElementById('send');
+
+    const clearBtn = document.getElementById('clear');
+
+
+
+    function addBubble(text, me=false){
+
+      const div = document.createElement('div');
+
+      div.className = 'bubble' + (me ? ' me' : '');
+
+      div.textContent = text;
+
+      chat.appendChild(div);
+
+      div.scrollIntoView({behavior:'smooth', block:'end'});
+
+    }
+
+
+
+    send.onclick = async () => {
+
+      const message = document.getElementById('msg').value.trim();
+
+      const lang = document.getElementById('lang').value;
+
+      const name = document.getElementById('name').value.trim();
+
+      if(!message) return;
+
+
+
+      addBubble(message, true);
+
+      document.getElementById('msg').value = '';
+
+      try {
+
+        const res = await fetch('/api/chat', {
+
+          method: 'POST',
+
+          headers: {'Content-Type':'application/json'},
+
+          body: JSON.stringify({ message, lang, name })
+
+        });
+
+        if(!res.ok) throw new Error('Network error');
+
+        const data = await res.json();
+
+        addBubble(data.reply || 'No reply');
+
+      } catch (e) {
+
+        addBubble('حدث خطأ في الاتصال بالخادم. حاول مجددًا.');
+
+      }
+
+    };
+
+
+
+    clearBtn.onclick = () => { chat.innerHTML = '' };
+
+  </script>
+
+</body>
+
+</html>
