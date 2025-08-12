@@ -8,23 +8,11 @@
 
   "type": "module",
 
-  "engines": {
-
-    "node": "22.x"
-
-  },
-
-  "scripts": {
-
-    "start": "node api/index.js",
-
-    "dev": "node api/index.js"
-
-  },
+  "engines": { "node": "18.x" },
 
   "dependencies": {
 
-    "openai": "^4.0.0"
+    "openai": "^4.52.0"
 
   }
 
